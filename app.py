@@ -1,73 +1,89 @@
-from flask import Flask, request, render_template, url_for, jsonify, session
-from werkzeug.exceptions import abort
+from flask import Flask, render_template, request, url_for
+from flask_migrate import Migrate
 from werkzeug.utils import redirect
+
+from database import db
+from forms import MenuForm
+from models import Menu
 
 app = Flask(__name__)
 
-#Añadir clave secreta:
-app.secret_key = 'Mi_llave_secreta'
+#configuramos la conexión a la bd
+USER_DB = 'postgres'
+PASS_DB = 'admin'
+URL_DB = 'localhost'
+NAME_DB = 'satv_flask_db'
+FULL_URL_DB = f'postgresql://postgres:admin@localhost:5432/satv_flask_db'
 
+app.config['SQLALCHEMY_DATABASE_URI'] = FULL_URL_DB
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#Inicialización del objeto db de sqlalchemy
 
+db.init_app(app)
+
+#configuramos el flask-migrate
+
+migrate = Migrate(app,db)
+
+#Configuración de flask-wtf
+app.config['SECRET_KEY'] = 'llave_secreta'
 
 @app.route('/')
+@app.route('/index')
+@app.route('/index.html')
 def inicio():
-    if 'username' in session:
-        return f'El usuario {session["username"]}, ya ha hecho login'
-    return 'no ha hecho login '
 
-@app.route('/login', methods=['GET','POST'])
-def login():
+    menus = Menu.query.order_by('id')
+    total_menus = Menu.query.count()
+
+    return render_template('index.html', menus=menus , total_menus = total_menus)
+
+@app.route('/ver/<int:id>')
+def ver_detalle(id):
+
+    menu = Menu.query.get_or_404(id)
+    return render_template('detalle.html', menu = menu)
+
+
+@app.route('/agregar', methods= ['GET','POST'])
+def agregar():
+
+    menu = Menu()
+    menuForm = MenuForm(obj=menu)
+
     if request.method == 'POST':
-        #Se omitió la validación de usuario y contraseña
-        usuario = request.form['username'] #mismo valor que en el formulario html
-        #Agregar usuario a la sesión
-        session['username'] = usuario
-        #Opcion simplificada:
-        #session['username'] = request.form['username']
-        return redirect(url_for('inicio'))
-    return render_template('login.html')
+        if menuForm.validate_on_submit():
+            menuForm.populate_obj(menu)
+            #Insertar nuevo registro en bd con sqlalchemy
+            db.session.add(menu)
+            db.session.commit()
+            return redirect(url_for('inicio'))
+    return render_template('agregar.html', forma = menuForm)
 
-#Eliminar sesion.
-@app.route('/logout')
-def logout():
-    session.pop('username')
+@app.route('/editar/<int:id>', methods = ['GET','POST'])
+def editar(id):
+    #Se recupera el objeto que se va a editar
+    menu = Menu.query.get_or_404(id)
+    menuForm = MenuForm(obj=menu)
+    if request.method == 'POST':
+        if menuForm.validate_on_submit():
+            menuForm.populate_obj(menu)
+
+            #Recuperar en la base de datos
+            db.session.commit()
+            return redirect(url_for('inicio'))
+    return render_template('editar.html', forma = menuForm)
+
+
+@app.route('/eliminar/<int:id>')
+def eliminar(id):
+
+    menu = Menu.query.get_or_404(id)
+    #Eliminamos objeto con db
+    db.session.delete(menu)
+    db.session.commit()
     return redirect(url_for('inicio'))
 
 
-@app.route('/saludar/<nombre>')
-def saludar(nombre):
-    return f'Saludos {nombre}'
-
-
-@app.route('/edad/<int:edad>')
-def mostrar_edad(edad):
-    return f'Tu edad es : {edad}'
-
-@app.route('/mostrar/<nombre>', methods=['GET', 'POST'])
-def mostrar_nombre(nombre):
-    return render_template('mostrar.html', nombre=nombre)
-
-#Redireccionar a otra página e incluir valores <>
-
-@app.route('/redireccionar')
-def redireccionar():
-    return redirect(url_for('mostrar_nombre', nombre='Juan' ))
-
-@app.route('/salir')
-def salir():
-    return abort(404)
-#Personalizar paginas de error
-
-
-@app.errorhandler(404)
-def pagina_no_encontrada(error):
-    return render_template('error404.html', error=error), 404 #Codigo de estado 404
-
-
-#REST Representational state transfer
-@app.route('/api/mostrar/<nombre>', methods = ['POST', 'GET'])
-def mostrar_json(nombre):
-    valores ={ 'nombre' : nombre, 'metodo_http' : request.method}
-    return jsonify(valores)
 
 
