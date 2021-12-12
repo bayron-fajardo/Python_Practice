@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ver Producto</title>
+</head>
+<body>
+    <h1>Ver producto</h1>
+<div>Id producto: {{menu.id}}</div>
+<div>Nombre producto: {{menu.nombre}}</div>
+<div>Descripción producto: {{menu.descipcion}}</div>
+<div>Unidades del producto: {{menu.cantidad_unidades}}</div>
+<div>Precio del producto: {{menu.precio}}</div>
+
+<br>
+<a href="{{url_for('inicio')}}">
+    <input type="button" value="Regresar">
+</a>
+</body>
+</html>

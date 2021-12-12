@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Producto</title>
+</head>
+<body>
+    <h1>Editar Producto</h1>
+    <form method="POST">
+        {{forma.csrf_token}}
+        <p>
+            {{forma.nombre.label}} <br/>
+            {{forma.nombre(size=30)}}
+        </p>
+        <p>
+            {{forma.descipcion.label}} <br/>
+            {{forma.descipcion(size=30)}}
+
+        </p>
+        <p>
+            {{forma.cantidad_unidades.label}} <br/>
+            {{forma.cantidad_unidades(size=30)}}
+
+        </p>
+        <p>
+            {{forma.precio.label}} <br/>
+            {{forma.precio(size=30)}}
+
+        </p>
+        <p>
+            {{forma.añadir()}}
+           <a href="{{url_for('inicio')}}">
+            <input type="button" name="regresar" value="Regresar">
+               </a>
+        </p>
+    </form>
+
+</body>
+</html>

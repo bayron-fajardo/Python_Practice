@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Producto</title>
+</head>
+<body>
+  <h1>Agregar Producto</h1>
+  <form method="POST">
+      {{forma.csrf_token}}
+    <p>
+        {{forma.nombre.label}} <br/>
+        {{forma.nombre(size=30)}}
+    </p>
+      <p>
+        {{forma.descipcion.label}} <br/>
+        {{forma.descipcion(size=90)}}
+    </p>
+      <p>
+        {{forma.cantidad_unidades.label}} <br/>
+        {{forma.cantidad_unidades(size=40)}}
+    </p>
+      <p>
+        {{forma.precio.label}} <br/>
+        {{forma.precio(size=30)}}
+    </p>
+      <p>
+          {{forma.añadir()}}
+      </p>
+  </form>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de administración de tiendas virtuales</title>
+</head>
+<body>
+    <h1>Listado de menú</h1>
+    <div>
+
+        Total de Productos: {{total_menus}}
+
+
+    </div>
+        <div>
+            <a href="{{url_for('agregar')}}">Agregar Producto</a>
+        </div>
+        <div>
+            <table border="1">
+                <thead>
+                    <tr>
+
+                        <th>Id</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+
+
+
+                </thead>
+                <tbody>
+                    {% for menu in menus %}
+                        <tr>
+                            <td>{{menu.id}}</td>
+                            <td>{{menu.nombre}}</td>
+                            <td>{{menu.descipcion}}</td>
+                            <td>{{menu.cantidad_unidades}}</td>
+                            <td>{{menu.precio}}</td>
+                            <td><a href="ver/{{menu.id}}">Ver Producto</a> </td>
+                            <td><a href="editar/{{menu.id}}">Editar Producto</a> </td>
+                            <td><a href="eliminar/{{menu.id}}">Eliminar Producto</a> </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+</body>
+</html>
